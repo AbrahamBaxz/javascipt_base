@@ -1,3 +1,6 @@
+import pkg from "lodash";
+const { uniq, uniqBy } = pkg;
+
 const arr1 = [
   { id: 1, name: "abra", age: 11 },
   { id: 2, name: "louis", age: 22 },
@@ -45,4 +48,71 @@ const cmprArrObj = (arr1, arr2, property = "id") => {
   return result;
 };
 
-console.log(cmprArrObj(arr1, arr2, "id"));
+//console.log(cmprArrObj(arr1, arr2, "id"));
+
+//____________________________________________________________
+
+const emplyoee = [
+  {
+    name: "renzo",
+    role: "tester",
+  },
+  {
+    name: "johnren",
+    role: "developer",
+  },
+  {
+    name: "abraham",
+    role: "manager",
+  },
+  {
+    name: "gary",
+    role: "tester",
+  },
+  {
+    name: "clifford",
+    role: "manager",
+  },
+  {
+    name: "renzo",
+    role: "????",
+  },
+];
+//_______________________FIND_INDEX_________________
+////1) Create a function which receives an Array of Numbers and search_value, return the indices that matches search value
+//findValue([1,5,7,5], 5 ) ===> [1,3]
+
+let randomArray = [1, 5, 7, 5];
+let number = 5;
+
+const findValue = (arr, num) => {
+  return arr.reduce((acc, curr, index) => {
+    if (curr === num) {
+      acc = [...acc, index];
+    }
+    return acc;
+  }, []);
+};
+
+console.log(findValue(randomArray, number));
+
+//______________LETTER COUNTER__________________________________
+//2) Given a string "ABCABCABCD" return "3A3B3C1D"
+//fn("ABCABCABCD") ===> "3A3B3C1D"
+
+let str = "AAABWDWF";
+const fn = (str) => {
+  const letters = [...str].reduce((acc, curr) => {
+    if (!acc[curr]) {
+      acc[curr] = 1;
+    } else {
+      acc[curr] += 1;
+    }
+    return acc;
+  }, {});
+
+  return Object.keys(letters).reduce((str, curr) => {
+    return (str += `${letters[curr]}${curr}`);
+  }, "");
+};
+console.log(fn(str));
