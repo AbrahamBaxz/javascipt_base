@@ -1,0 +1,19 @@
+import jsonexport from 'jsonexport'
+import fileSaver from 'file-saver'
+
+  jsonexport(
+    result.payload.data.map(e => {
+      delete e.id
+      return {
+        'Title': e.title,
+        'Review Question': e.question,
+        'Option': e.options.filter(e => e.name)
+        .map(ee => ee.name)
+        .join(', ')
+      }
+    }),
+    options,
+    (err, csv) => {
+      return fileSaver.saveAs(new Blob([csv], headers), file_name)
+    }
+  )
