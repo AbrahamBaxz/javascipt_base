@@ -1,0 +1,68 @@
+    import { chunk } from 'lodash'
+    import jsonexport from 'jsonexport'
+    import moment from 'moment'
+    import fileSaver from 'file-saver'
+
+    createMultipleConfigForExportCSV(config, payload) {
+        const LIMIT_PER_BATCH = 10000
+        const NUMBER_OF_BATCHES = Math.ceil(payload.limit / LIMIT_PER_BATCH)
+        return Array(NUMBER_OF_BATCHES).fill(null).map((_, index) => ({
+        ...config,
+        data: {
+            ...payload,
+            limit: (index * LIMIT_PER_BATCH) + LIMIT_PER_BATCH,
+            start: index * LIMIT_PER_BATCH
+        }
+        }))
+    }
+
+function* request_large({ payload }){
+
+    let config = {
+    method: 'post',
+    url: `/${entity}/grid`,
+    data: {
+      ...payload,
+      export: true
+    }
+    }
+
+    createMultipleConfigForExportCSV(config, payload)
+
+    const chunks = chunk(configs, 5)
+
+    for (const c of chunks) {
+        const results2 = yield all(
+        c.map(config => call(axios, config, EXPORT_CSV_REGISTRATION))
+        )
+        // start error handling
+        const error = results2.find(e => e.type !== EXPORT_CSV_REGISTRATION)
+        if (error) {
+        yield put({ type: EXPORTED_CSV })
+        yield put(error)
+        return
+        }
+        results = [...results, ...results2]
+        // end error handling
+    }
+
+    const data = results.reduce((all, current) => (
+        [...all, ...current.payload.data]
+    ), [])    
+
+    jsonexport(
+        data.map(e => {
+        delete e.id
+        return {
+            'IMEI': e.imei || e.serial_number,
+            'Pincode': e.pin,
+            'First Name': e.first_name,
+        }
+        }),
+        options,
+        (err, csv) => {
+        return fileSaver.saveAs(new Blob([csv], headers), file_name)
+        }
+    )
+
+}
